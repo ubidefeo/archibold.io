@@ -159,8 +159,7 @@ fi'
     gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'
     gsettings set org.gnome.nautilus.list-view default-zoom-level 'small'
     gsettings set org.gnome.nautilus.list-view use-tree-view true
-    # TODO: missing configurations
-    # set folders before files ?
+    gsettings set org.gtk.Settings.FileChooser sort-directories-first true
 
     write "Configuring Firefox"
     xdg-settings set default-web-browser firefox.desktop
@@ -169,11 +168,14 @@ fi'
     if [ "$(which pamac 2> /dev/null)" = "" ]; then
       write "Installing base-devel and git"
       echo "$PASSWORD" | sudo -S pacman -S --needed --noconfirm base-devel git
-      write "Installing pamac-aur"
+      if [ -f ~/.gitconfig ] && [ "$(cat ~/.gitconfig | grep alias)" = "" ]; then
+        write "Adding common git aliases"
+        curl -s https://archibold.io/install/git-alias >> ~/.gitconfig
+      fi
 
+      write "Installing pamac-aur"
       # TODO somehow this wasn't part of the dependencies, see if it's needed in the future
       echo "$PASSWORD" | sudo -S pacman -S --needed --noconfirm xorgproto
-
       rm -rf /tmp/pamac-aur
       cd /tmp
       git clone https://aur.archlinux.org/pamac-aur.git
